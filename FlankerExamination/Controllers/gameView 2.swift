@@ -17,7 +17,7 @@ class gameView: UIViewController {
     let JsonPost = ServerRequests()
     
     var schoolId: Int = 0
-    var ID: String = ""
+    var ID: Int = 0
     var StartTime: Double?
     var score = 0
     var isCongruent: Int?
@@ -86,10 +86,11 @@ class gameView: UIViewController {
             self.timer.invalidate()
             self.arrowManager = nil
             self.seconds = 5
-//            print("PostData ->", PostData)
-//            print(self.ID, self.schoolId, self.StartTime!)
+            print("PostData ->", PostData)
             
-            JsonPost.createPost(candidate_id: self.ID , school_id: self.schoolId , test_time: StartTime!, test_instance_id: 1, test_id: 1, test_entries: PostData) { (err) in
+            print(self.ID, self.schoolId, self.StartTime!)
+            
+            JsonPost.createPost(candidate_id: self.ID , school_id: self.schoolId , test_time: self.StartTime!, test_instance_id: 1, test_id: 1, test_entries: PostData) { (err) in
                 if let error = err {
                     let alert = UIAlertController(title: "Failed to Send", message: "Check your wifi or cellular signal as you are in a state where the server can not retrieve your important data. \(error)", preferredStyle: .alert)
                     alert.addAction(UIAlertAction(title: "Try Again", style: .default, handler: nil))
@@ -126,11 +127,10 @@ class gameView: UIViewController {
     //determining the average response time by getting the sum of the dictionary values for "response_time"
     func averageResponseTime() -> Double {
         var responseSum = 0.0
-        print("Length of PostData", self.PostData.count)
         for i in self.PostData {
-            responseSum = responseSum + (i["response_time"] as! Double)
+            responseSum = responseSum + (self.PostData[i.count]["response_time"] as! Double)
         }
-        let average = round(responseSum / 20.0)
+        let average = responseSum/20.0
         return average
     }
     
@@ -161,7 +161,7 @@ class gameView: UIViewController {
                     
                     //recording the response time and adding it to the post data object
                     let DataTime = NSDate().timeIntervalSince1970
-                    self?.PostData[(self?.PostData.count)! - 1]["response_time"] = (DataTime - self!.presentTime!) * 1000
+                    self?.PostData[(self?.PostData.count)! - 1]["response_time"] = (DataTime - self!.presentTime!)
                     
                     
                     //this switch statement determines score
@@ -189,7 +189,6 @@ class gameView: UIViewController {
             }
         }
     }
-    
     
     //passing data through segue
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
